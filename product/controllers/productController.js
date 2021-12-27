@@ -1,4 +1,5 @@
 const Product = require('../models/ProductModel')
+let productMap = {}
 
 exports.getAllProducts = async (req, res, next) => {
   try {
@@ -9,16 +10,40 @@ exports.getAllProducts = async (req, res, next) => {
   }
 }
 
+exports.getAProduct = async (req, res, next) => {
+  try {
+    const id = req.params.id
+
+    const productObj = productMap[id]
+
+    if (productObj) {
+      return res.status(200).send(productObj)
+    }
+
+    const product = await Product.findById(id)
+    productMap[product.id] = product
+
+    return res.status(200).send(product)
+  } catch (err) {
+    return res.status(500).json({ status: 'server error', message: err })
+  }
+}
+
 exports.addProduct = async (req, res, next) => {
   try {
     const { name, quantity } = req.body
 
-    const product = new Product({
+    const productVal = new Product({
       name: name,
       quantity: quantity
     })
 
-    const newProduct = await product.save()
+    const product = new Inventory(productVal)
+
+    const newProduct = await product.save((err, productCollection) => {
+      productMap[productCollection._id] = productVal // save to map
+    })
+
     return res.status(201).send(newProduct)
   } catch (err) {
     return res.status(500).json({ status: 'server error', message: err })
