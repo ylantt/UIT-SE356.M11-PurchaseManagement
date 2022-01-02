@@ -107,6 +107,9 @@ exports.removeInventory = async (req, res) => {
 
     await axios.post(`${process.env.DOMAIN}:5011/events`, {
       type: 'InventoryRemoved',
+      data: {
+        id: id,
+      },
     })
     return res.status(200)
   } catch (err) {
