@@ -27,6 +27,7 @@ exports.addInventory = async (req, res, next) => {
     const inventory = new Inventory(inventoryVal)
 
     const newInventory = await inventory.save((err, inventoryCollection) => {
+      console.log(inventoryCollection._id)
       inventoryMap[inventoryCollection._id] = inventoryVal // save to map
     })
 
