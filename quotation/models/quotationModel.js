@@ -1,24 +1,14 @@
 const mongoose = require('mongoose')
-const schema = mongoose.Schema
+module.exports = function Quotation(oldQuotation) {
+  this.products = oldQuotation.products || {};
+  this.addProductToQuotation = function(item, id) {
+    var productItem = this.products[id];
+    if (!productItem) {
+      productItem = this.products[id] = {product: item};
+    }
+  }
+  this.removeProductFromQuotation = function(item, id) {
+    delete this.products[id];
+  }
+}
 
-const quotationSchema = new mongoose.Schema({
-  name: String,
-  products: [
-    productSchema
-  ],
-})
-
-const productSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  quantity: Number,
-  provider: providerSchema
-})
-
-const providerSchema = new mongoose.Schema({
-  name: String,
-  phoneNumber: String,
-  description: String,
-})
-const Quotation = mongoose.model('Quotation', quotationSchema)
-module.exports = Quotation
