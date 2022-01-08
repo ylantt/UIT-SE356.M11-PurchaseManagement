@@ -1,4 +1,8 @@
 const Inventory = require('../models/InventoryModel')
+const axios = require('axios')
+const dotenv = require('dotenv')
+
+dotenv.config({ path: '../../config.env' })
 let inventoryMap = {}
 
 exports.getAllInventories = async (req, res, next) => {
@@ -26,10 +30,20 @@ exports.addInventory = async (req, res, next) => {
 
     const inventory = new Inventory(inventoryVal)
 
-    const newInventory = await inventory.save((err, inventoryCollection) => {
-      inventoryMap[inventoryCollection._id] = inventoryVal // save to map
-    })
+    const newInventory = await inventory.save(
+      async (err, inventoryCollection) => {
+        console.log(inventoryCollection._id)
+        inventoryMap[inventoryCollection._id] = inventoryVal // save to map
 
+        await axios.post(`${process.env.DOMAIN}:5011/events`, {
+          type: 'InventoryCreated',
+          data: {
+            id: inventoryCollection._id,
+            ...inventoryVal,
+          },
+        })
+      }
+    )
     return res.status(201).send(newInventory)
   } catch (err) {
     return res.status(500).json({ status: 'server error', message: err })
@@ -71,6 +85,14 @@ exports.updateInventory = async (req, res, next) => {
     inventoryMap[id] = updatedInventory
 
     await Inventory.findByIdAndUpdate(id, updatedInventory)
+
+    await axios.post(`${process.env.DOMAIN}:5011/events`, {
+      type: 'InventoryUpdated',
+      data: {
+        id: id,
+        ...updatedInventory,
+      },
+    })
     return res.status(200)
   } catch (err) {
     return res.status(500).json({ status: 'server error', message: err })
@@ -82,6 +104,13 @@ exports.removeInventory = async (req, res) => {
     const id = req.params.id
     delete inventoryMap[id]
     await Inventory.findByIdAndDelete(id)
+
+    await axios.post(`${process.env.DOMAIN}:5011/events`, {
+      type: 'InventoryRemoved',
+      data: {
+        id: id,
+      },
+    })
     return res.status(200)
   } catch (err) {
     return res.status(500).json({ status: 'server error', message: err })
