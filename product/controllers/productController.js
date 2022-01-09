@@ -42,6 +42,14 @@ exports.addProduct = async (req, res, next) => {
 
     const newProduct = await product.save((err, productCollection) => {
       productMap[productCollection._id] = productVal // save to map
+
+      await axios.post(`${process.env.DOMAIN}:5011/events`, {
+        type: 'ProductAdded',
+        data: {
+          id: id,
+          ...productVal,
+        },
+      })
     })
 
     return res.status(201).send(newProduct)
@@ -60,6 +68,14 @@ exports.updateProduct = async (req, res, next) => {
     }
 
     await Product.findByIdAndUpdate(req.params.id, updatedProduct)
+
+    await axios.post(`${process.env.DOMAIN}:5011/events`, {
+      type: 'ProductUpdated',
+      data: {
+        id: id,
+        ...updatedProduct,
+      },
+    })
     return res.status(200)
   } catch (err) {
     return res.status(500).json({ status: 'server error', message: err })
@@ -68,9 +84,16 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.removeProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id)
-    await product.remove()
+    const id = req.params.id
+    delete productMap[id]
+    await Product.findByIdAndDelete(id)
 
+    await axios.post(`${process.env.DOMAIN}:5011/events`, {
+      type: 'ProductRemoved',
+      data: {
+        id: id,
+      },
+    })
     return res.status(200)
   } catch (err) {
     return res.status(500).json({ status: 'server error', message: err })
