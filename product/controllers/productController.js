@@ -40,7 +40,7 @@ exports.addProduct = async (req, res, next) => {
 
     const product = new Inventory(productVal)
 
-    const newProduct = await product.save((err, productCollection) => {
+    const newProduct = await product.save( async (err, productCollection) => {
       productMap[productCollection._id] = productVal // save to map
 
       await axios.post(`${process.env.DOMAIN}:5011/events`, {
@@ -60,14 +60,18 @@ exports.addProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
   try {
-    const { name, quantity, } = req.body
+    const { name, quantity, __v} = req.body
 
     const updatedProduct = {
       name: name,
       quantity: quantity,
+      __v: (parseInt(__v) + 1).toString(),
     }
 
-    await Product.findByIdAndUpdate(req.params.id, updatedProduct)
+    const result = await Product.updateOne({_id: req.params.id, versionKey: versionKey}, updatedProduct)
+    if (result == null) {
+      return res.status(409).json({ status: 'conflict', message: "conflict" })
+    }
 
     await axios.post(`${process.env.DOMAIN}:5011/events`, {
       type: 'ProductUpdated',
