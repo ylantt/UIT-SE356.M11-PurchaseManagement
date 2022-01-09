@@ -4,11 +4,8 @@ const router = express.Router()
 
 router
   .route('/')
-  .get(productLifeCircleController.getAllInventories)
+  .get(productLifeCircleController.acceptBuyInNextMonth)
 
-router
-  .route('/:id')
-  .delete(productLifeCircleController.removeInventory)
-  .put(productLifeCircleController.updateInventory)
+
 
 module.exports = router

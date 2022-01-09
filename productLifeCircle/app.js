@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override') // use PUT, Delete,...
-const productLifeCircleRouter = require('./routes/productLifeCircleRouter')
+const productLifeCircleRouter = require('./routes/productLifeCircleRoutes')
 
 let app = express()
 
