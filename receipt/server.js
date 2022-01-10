@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const app = require('./app')
 
 dotenv.config({ path: '../config.env' })
-const port = process.env.RECEIPT_POR || 5012
+const port = process.env.RECEIPT_PORT || 5012
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
