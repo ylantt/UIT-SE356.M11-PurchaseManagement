@@ -15,7 +15,3 @@ providerSchema.virtual('email').get(function(){
 
 const Provider = mongoose.model('Provider', providerSchema)
 module.exports = Provider
-
-// Provider.findOne(function(err, doc) {
-//     console.log(doc.email);
-// });
