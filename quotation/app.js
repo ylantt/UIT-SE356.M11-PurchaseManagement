@@ -3,7 +3,7 @@ const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const path = require('path')
 const bodyParser = require('body-parser')
-const providerRouter = require('./routes/quotationRouter');
+const quotationRouter = require('./routes/quotationRouter');
 
 let app = express()
 const oneDay = 1000 * 60 * 60 * 24;
