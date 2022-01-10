@@ -3,7 +3,10 @@ let productMap = {}
 
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const products = await Product.find()
+    const offset = req.params.offset;
+    const limit = req.params.limit;
+
+    const products = await Product.find().skip(offset).limit(limit);
     return res.status(200).send(products)
   } catch (err) {
     return res.status(500).json({ status: 'server error', message: err })
